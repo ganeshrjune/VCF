@@ -1,0 +1,29 @@
+# Terraform working directory and local state
+**/.terraform/*
+*.tfstate
+*.tfstate.*
+crash.log
+crash.*.log
+
+# Real variable files can contain secrets; keep only examples in Git
+*.tfvars
+!*.tfvars.example
+*.auto.tfvars
+*.auto.tfvars.json
+
+# Terraform override files
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# CLI configuration and local plans
+.terraformrc
+terraform.rc
+*.tfplan
+*.plan
+
+# Local editor / OS files
+.DS_Store
+Thumbs.db
+.vscode/
