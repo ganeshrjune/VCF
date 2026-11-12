@@ -30,11 +30,14 @@ try {
     $connection = Connect-VIServer -Server $VIServer -Credential $credential -ErrorAction Stop
 
     $category = Get-TagCategory -Name $TagCategory -Server $connection -ErrorAction SilentlyContinue
-    $tag = Get-Tag -Name $TagName -Category $TagCategory -Server $connection -ErrorAction SilentlyContinue
-
     if ($category -and ($category.Cardinality -ne "Multiple" -or
         $category.EntityType -notcontains "VirtualMachine")) {
         throw "Existing category '$TagCategory' must use Multiple cardinality and include VirtualMachine entity type."
+    }
+
+    $tag = $null
+    if ($category) {
+        $tag = Get-Tag -Name $TagName -Category $category -Server $connection -ErrorAction SilentlyContinue
     }
 
     $vms = @(Get-VM -Server $connection | Sort-Object Name)
