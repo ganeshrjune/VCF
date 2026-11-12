@@ -2,6 +2,31 @@
 
 PowerCLI automation for applying a vCenter inventory tag to every virtual machine visible to the configured vCenter account.
 
+
+## Test the vCenter connection
+
+The `.github/workflows/test-vcenter-connection.yml` workflow is a manual, read-only connectivity check. It connects to vCenter, reads product/version/build details and counts VMs visible to the account, then disconnects. It does not create, update, or delete vCenter objects.
+
+The workflow uses a **self-hosted GitHub Actions runner** because a private homelab vCenter is normally not reachable from GitHub-hosted runners. Install PowerShell 7 on the runner and register it with this repository. The runner must be on a trusted network that can resolve and reach the vCenter FQDN.
+
+Configure the existing `vcenter-lab` GitHub Actions environment:
+
+| Name | Type | Value |
+|---|---|---|
+| `VCENTER_SERVER` | Variable | `vc01.skillservices.com.au` |
+| `VCENTER_USERNAME` | Secret | Your vCenter account |
+| `VCENTER_PASSWORD` | Secret | Your vCenter password |
+
+Do not place passwords in workflow files, scripts, or commits. Use a dedicated least-privilege account where possible.
+
+When vCenter is powered on and the runner is online, open **Actions → Test vCenter Connection → Run workflow**. The workflow is manual only and will not run until you start it. The script uses a session-only PowerCLI certificate warning setting for a self-signed lab certificate; use a trusted certificate with strict validation for production.
+
+For local testing, install VMware PowerCLI and set the three environment variables above, then run:
+
+```powershell
+./scripts/Test-VCenterConnection.ps1
+```
+
 ## GitHub Actions: tag all VMs
 
 The `.github/workflows/tag-vms.yml` workflow is manual only. It has no push or schedule trigger.
