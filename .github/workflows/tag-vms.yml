@@ -1,0 +1,64 @@
+name: Apply vCenter VM Tags
+
+on:
+  workflow_dispatch:
+    inputs:
+      apply:
+        description: "Apply tags in vCenter (false = dry run)"
+        required: true
+        type: boolean
+        default: false
+      tag_category:
+        description: "vCenter tag category"
+        required: true
+        type: string
+        default: "Automation"
+      tag_name:
+        description: "Tag to apply to all VMs"
+        required: true
+        type: string
+        default: "ManagedBy-GitHubActions"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: vcenter-vm-tagging
+  cancel-in-progress: false
+
+jobs:
+  tag-vms:
+    name: Preview or apply VM tags
+    runs-on: ubuntu-latest
+    # Configure required reviewers under Settings > Environments > vcenter-lab.
+    environment: vcenter-lab
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install PowerShell
+        uses: microsoft/setup-powershell@v2
+
+      - name: Install VMware PowerCLI
+        shell: pwsh
+        run: |
+          Set-PSRepository -Name PSGallery -InstallationPolicy Trusted
+          Install-Module VMware.PowerCLI -Scope CurrentUser -Force -AllowClobber
+
+      - name: Run VM tagging script
+        shell: pwsh
+        env:
+          VCENTER_SERVER: ${{ vars.VCENTER_SERVER }}
+          VCENTER_USERNAME: ${{ secrets.VCENTER_USERNAME }}
+          VCENTER_PASSWORD: ${{ secrets.VCENTER_PASSWORD }}
+        run: |
+          $params = @{
+            TagCategory = "${{ inputs.tag_category }}"
+            TagName = "${{ inputs.tag_name }}"
+          }
+          if ("${{ inputs.apply }}" -eq "true") {
+            ./scripts/Set-VCenterVmTags.ps1 @params -Apply
+          }
+          else {
+            ./scripts/Set-VCenterVmTags.ps1 @params
+          }
