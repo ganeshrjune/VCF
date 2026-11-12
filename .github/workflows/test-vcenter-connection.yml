@@ -1,0 +1,40 @@
+name: Test vCenter Connection
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: vcenter-connection-test
+  cancel-in-progress: false
+
+jobs:
+  connection-test:
+    name: Connect and read vCenter details
+    # A self-hosted runner is required when vCenter is only reachable on the homelab network.
+    runs-on: self-hosted
+    environment: vcenter-lab
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install VMware PowerCLI if required
+        shell: pwsh
+        run: |
+          if (-not (Get-Module -ListAvailable -Name VMware.PowerCLI)) {
+            Set-PSRepository -Name PSGallery -InstallationPolicy Trusted
+            Install-Module VMware.PowerCLI -Scope CurrentUser -Force -AllowClobber
+          }
+          Import-Module VMware.PowerCLI -ErrorAction Stop
+
+      - name: Test vCenter connection
+        shell: pwsh
+        env:
+          VCENTER_SERVER: ${{ vars.VCENTER_SERVER }}
+          VCENTER_USERNAME: ${{ secrets.VCENTER_USERNAME }}
+          VCENTER_PASSWORD: ${{ secrets.VCENTER_PASSWORD }}
+        run: ./scripts/Test-VCenterConnection.ps1
