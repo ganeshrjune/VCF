@@ -29,7 +29,7 @@ concurrency:
 jobs:
   tag-vms:
     name: Preview or apply VM tags
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     # Configure required reviewers under Settings > Environments > vcenter-lab.
     environment: vcenter-lab
     steps:
