@@ -2,6 +2,13 @@
 
 PowerCLI automation for applying a vCenter inventory tag to every virtual machine visible to the configured vCenter account.
 
+## Terraform for the vSphere lab
+
+A starter Terraform configuration is available under [terraform/environments/lab](terraform/environments/lab). It uses the VMware vSphere provider to perform a read-only lookup of the configured vCenter datacenter. It does not create or modify VMs, networks, datastores, clusters, or other vSphere objects.
+
+See [Terraform README](terraform/README.md) for the folder layout, local-state policy, credential setup, and validation steps.
+
+**Safety:** Terraform state remains local and is excluded from Git. Real `.tfvars` files and credentials are excluded from Git. Only the example variables file is committed. Do not run `terraform apply` until a future change has been reviewed.
 
 ## Test the vCenter connection
 

@@ -1,0 +1,5 @@
+# Copy this file to terraform.tfvars and replace the datacenter name
+# with the exact name shown in your vCenter inventory.
+vsphere_server       = "vc01.skillservices.com.au"
+datacenter_name      = "REPLACE_WITH_VCENTER_DATACENTER_NAME"
+allow_unverified_ssl = false
